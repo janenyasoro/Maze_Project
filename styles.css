@@ -108,4 +108,39 @@ p {
     font-size: 1em;
     color: #666;
 }
+#about-project {
+    background-color: #eaeaea;
+    padding: 50px 20px;
+    text-align: center;
+}
+
+.about-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.about-content p {
+    font-size: 1.2em;
+    color: #333;
+    line-height: 1.6;
+}
+
+.about-content ul {
+    list-style: none;
+    padding: 0;
+}
+
+.about-content ul li {
+    font-size: 1.2em;
+    margin: 10px 0;
+}
+
+.about-content a {
+    color: #0073e6;
+    text-decoration: none;
+}
+
+.about-content a:hover {
+    text-decoration: underline;
+}
 
