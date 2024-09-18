@@ -128,7 +128,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [What your code repository says about you](#)
 - [Awesome list of READMEs](https://github.com/matiassingers/awesome-readme)
 
----
-
-Feel free to customize the links and flowchart based on your content!
 
