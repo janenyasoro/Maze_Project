@@ -121,11 +121,5 @@ For major changes, please open an issue to discuss what you would like to change
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
----
-
-## Resources
-
-- [What your code repository says about you](#)
-- [Awesome list of READMEs](https://github.com/matiassingers/awesome-readme)
 
 
