@@ -1,0 +1,27 @@
+#ifndef ENEMY_H
+#define ENEMY_H
+
+#include <SDL2/SDL.h>
+#include "map.h"
+#include "player.h"
+
+#define MAX_ENEMIES 10
+
+typedef struct {
+    double x;
+    double y;
+    int texture_id;
+    int health;
+} Enemy;
+
+typedef struct {
+    Enemy enemies[MAX_ENEMIES];
+    int count;
+} EnemyManager;
+
+EnemyManager* init_enemy_manager(Map* map);
+void free_enemy_manager(EnemyManager* manager);
+void update_enemies(EnemyManager* manager, Player* player, Map* map);
+void draw_enemies(SDL_Renderer* renderer, EnemyManager* manager, Player* player, Map* map);
+
+#endif
