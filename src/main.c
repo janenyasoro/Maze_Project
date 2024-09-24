@@ -1,146 +1,97 @@
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include <stdio.h>
-#include <stdbool.h>
-#include <math.h>
-#include "raycaster.h"
-#include "textures.h"
-#include "player.h"
-#include "map.h"
-#include "enemy.h"
-#include "weapon.h"
-#include "rain.h"
+#include "../headers/header.h"
 
-#define SCREEN_WIDTH 800
-#define SCREEN_HEIGHT 600
+bool GameRunning = false;
+int TicksLastFrame;
+player_t player;
 
-int main(int argc, char* argv[]) {
-    SDL_Window* window = NULL;
-    SDL_Renderer* renderer = NULL;
-    Player player = {1.5, 1.5, 1.0, 0.0, 0.0, 0.066, 0};
-    Map* map = NULL;
-    TextureManager* texture_manager = NULL;
-    EnemyManager* enemy_manager = NULL;
-    WeaponManager* weapon_manager = NULL;
-    RainManager* rain_manager = NULL;
-    bool is_raining = false;
+/**
+ * setup_game - initialize player variables and load wall textures
+ *
+*/
 
-    // Initialize SDL
-    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-        printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
-        return 1;
-    }
+void setup_game(void)
+{
 
-    // Create window
-    window = SDL_CreateWindow("Maze Raycaster", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-                              SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-    if (window == NULL) {
-        printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
-        return 1;
-    }
+	player.x = SCREEN_WIDTH / 2;
+	player.y = SCREEN_HEIGHT / 2;
+	player.width = 1;
+	player.height = 30;
+	player.walkDirection = 0;
+	player.walkSpeed = 100;
+	player.turnDirection = 0;
+	player.turnSpeed = 45 * (PI / 180);
+	player.rotationAngle = PI / 2;
+	WallTexturesready();
+}
 
-    // Create renderer
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-    if (renderer == NULL) {
-        printf("Renderer could not be created! SDL_Error: %s\n", SDL_GetError());
-        return 1;
-    }
 
-    // Initialize texture manager
-    texture_manager = init_texture_manager(renderer);
-    if (texture_manager == NULL) {
-        printf("Failed to initialize texture manager\n");
-        return 1;
-    }
+/**
+ * update_game - update_game delta time, the ticks last frame
+ *          the player movement and the ray casting
+ *
+*/
+void update_game(void)
+{
+	float DeltaTime;
+	int timeToWait = FRAME_TIME_LENGTH - (SDL_GetTicks() - TicksLastFrame);
 
-    // Load map
-    map = load_map("assets/map.txt");
-    if (map == NULL) {
-        printf("Failed to load map\n");
-        return 1;
-    }
+	if (timeToWait > 0 && timeToWait <= FRAME_TIME_LENGTH)
+	{
+		SDL_Delay(timeToWait);
+	}
+	DeltaTime = (SDL_GetTicks() - TicksLastFrame) / 1000.0f;
 
-    // Initialize enemy manager
-    enemy_manager = init_enemy_manager(map);
-    if (enemy_manager == NULL) {
-        printf("Failed to initialize enemy manager\n");
-        return 1;
-    }
+	TicksLastFrame = SDL_GetTicks();
 
-    // Initialize weapon manager
-    weapon_manager = init_weapon_manager(renderer);
-    if (weapon_manager == NULL) {
-        printf("Failed to initialize weapon manager\n");
-        return 1;
-    }
+	movePlayer(DeltaTime);
+	castAllRays();
+}
 
-    // Initialize rain manager
-    rain_manager = init_rain_manager(SCREEN_WIDTH, SCREEN_HEIGHT);
-    if (rain_manager == NULL) {
-        printf("Failed to initialize rain manager\n");
-        return 1;
-    }
+/**
+ * render - calls all functions needed for on-screen rendering
+ *
+*/
 
-    // Main game loop
-    bool quit = false;
-    SDL_Event e;
+void render_game(void)
+{
+	clearColorBuffer(0xFF000000);
 
-    while (!quit) {
-        // Handle events
-        while (SDL_PollEvent(&e) != 0) {
-            if (e.type == SDL_QUIT) {
-                quit = true;
-            }
-            handle_input(&e, &player, weapon_manager);
+	renderWall();
 
-            // Toggle rain with 'R' key
-            if (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_r) {
-                is_raining = !is_raining;
-            }
-        }
+	renderMap();
+	renderRays();
+	renderPlayer();
 
-        // Update player position
-        update_player(&player, map);
+	renderColorBuffer();
+}
 
-        // Update enemies
-        update_enemies(enemy_manager, &player, map);
+/**
+ * Destroy - free wall textures and destroy window
+ *
+*/
+void destroy_game(void)
+{
+	freeWallTextures();
+	destroyWindow();
+}
 
-        // Update rain
-        if (is_raining) {
-            update_rain(rain_manager);
-        }
+/**
+ * main - main function
+ * Return: 0
+*/
 
-        // Clear screen
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-        SDL_RenderClear(renderer);
+int main(void)
+{
+	GameRunning = initializeWindow();
 
-        // Render walls with lighting effects
-        render_walls(renderer, &player, map, texture_manager, is_raining);
+	setup_game();
 
-        // Render enemies
-        draw_enemies(renderer, enemy_manager, &player, map);
-
-        // Render rain
-        if (is_raining) {
-            draw_rain(renderer, rain_manager);
-        }
-
-        // Render weapon
-        draw_weapon(renderer, weapon_manager, player.current_weapon);
-
-        // Update screen
-        SDL_RenderPresent(renderer);
-    }
-
-    // Clean up
-    free_texture_manager(texture_manager);
-    free_map(map);
-    free_enemy_manager(enemy_manager);
-    free_weapon_manager(weapon_manager);
-    free_rain_manager(rain_manager);
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
-    SDL_Quit();
-
-    return 0;
+	while (GameRunning)
+	{
+		handleInput();
+		update_game();
+		render_game();
+	}
+	destroy_game();
+	return (0);
 }
