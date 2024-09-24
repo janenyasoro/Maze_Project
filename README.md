@@ -24,9 +24,7 @@ Simple DirectMedia Layer (**SDL2**) is a cross-platform development library that
 
 ## Screenshot
 
-![The Maze Screenshot](#)  
-_Add a screenshot of your running game here, showcasing the 3D environment._
-
+ https://youtu.be/6T2N8gNUTQ8
 ---
 
 ## Installation
