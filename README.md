@@ -96,7 +96,8 @@ This will compile the source files and generate the executable for the Maze game
 
 Include a flowchart that represents how the game logic and raycasting work. (Update the link with the flowchart image)
 
-![The Maze Flowchart](#)
+![image](https://github.com/user-attachments/assets/c83a9bb3-691a-4d4e-abae-8571b82e6156)
+
 
 ---
 
